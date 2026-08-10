@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAC COMPUTERS RAMNAD Score Board</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --text-primary: #f8fafc;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --btn-bg: #1e293b;
+    --btn-hover: #334155;
+    --keypad-bg: rgba(15, 23, 42, 0.8);
+    --subtext: #94a3b8;
+    --modal-bg: #1e293b;
+    --input-bg: #0f172a;
+}
+
+[data-theme="light"] {
+    --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+    --text-primary: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --btn-bg: #ffffff;
+    --btn-hover: #e2e8f0;
+    --keypad-bg: rgba(255, 255, 255, 0.6);
+    --subtext: #475569;
+    --modal-bg: #ffffff;
+    --input-bg: #f8fafc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.app-wrapper {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Header Section */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #0284c7, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+.theme-toggle-btn {
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Scoreboard Card */
+.board-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.innings-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #0284c7;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.score {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+#runs {
+    font-size: 130px;
+    font-weight: 800;
+    line-height: 0.9;
+    color: var(--text-primary);
+}
+
+#wickets {
+    font-size: 65px;
+    font-weight: 700;
+    color: #ef4444;
+    margin-left: 8px;
+}
+
+.overs-container {
+    margin-top: 10px;
+    font-size: 26px;
+    color: var(--subtext);
+    font-weight: 600;
+}
+
+#overs {
+    color: #0284c7;
+    font-weight: 700;
+}
+
+/* Target Box */
+.target-box {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.target-card {
+    background: var(--keypad-bg);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.target-card .lbl {
+    font-size: 11px;
+    color: var(--subtext);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.target-card .val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+/* Keypad Section */
+.keypad-section {
+    background: var(--keypad-bg);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--subtext);
+    margin-bottom: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+button {
+    height: 60px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: var(--btn-hover);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Specific Run Button Colors */
+.btn-dot { font-size: 32px !important; color: var(--subtext) !important; }
+.btn-extra { background: #0284c7 !important; color: #fff !important; }
+.btn-one { background: #10b981 !important; color: #fff !important; }
+.btn-two { background: #2563eb !important; color: #fff !important; }
+.btn-three { background: #06b6d4 !important; color: #fff !important; }
+
+/* Numpad Cluster Keys: 4 | WICKET | 6 */
+.btn-four {
+    height: 85px !important;
+    background: linear-gradient(135deg, #0b26f5 0%, #0b26f5 100%) !important;
+    color: #ffffff !important;
+    font-size: 38px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35) !important;
+    border: none !important;
+    border-radius: 16px !important;
+}
+
+.btn-wicket {
+    height: 85px !important;
+    background: linear-gradient(135deg, #f90000 0%, #ff0000 100%) !important;
+    color: #ffffff !important;
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35) !important;
+    border: none !important;
+    border-radius: 16px !important;
+}
+
+.btn-six {
+    height: 85px !important;
+    background: linear-gradient(135deg, #ea740c 0%, #ea740c 100%) !important;
+    color: #ffffff !important;
+    font-size: 38px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35) !important;
+    border: none !important;
+    border-radius: 16px !important;
+}
+
+.btn-undo { background: #c4ff04 !important; color: #220909 !important; height: 55px !important; }
+
+/* Always Open Direct Control Actions */
+.direct-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.scoreBtn { background: #4f46e5 !important; color: white !important; }
+.reset { background: #64748b !important; color: white !important; }
+
+/* Footer Branding */
+.footer-credit {
+    text-align: center;
+    font-size: 13px;
+    color: var(--subtext);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal {
+    background: var(--modal-bg);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    color: var(--text-primary);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 28px;
+    color: var(--subtext);
+    height: auto;
+    width: auto;
+    box-shadow: none;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--subtext);
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.submit-btn {
+    width: 100%;
+    background: #0d9488 !important;
+    color: #fff !important;
+    margin-top: 10px;
+}
+
+.mode-toggle-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    flex: 1;
+    height: 45px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--subtext);
+    border: 1px solid var(--border-color);
+}
+
+.mode-btn.active {
+    background: #0284c7 !important;
+    color: #fff !important;
+    border-color: #0284c7;
+}
+
+.over-row {
+    background: var(--input-bg);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.over-title-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 80px;
+}
+
+.over-title {
+    font-weight: 700;
+    color: #0284c7;
+    font-size: 15px;
+}
+
+.over-total {
+    font-weight: 600;
+    color: var(--subtext);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.balls-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.ball-tag {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.ball-tag.dot { background: #64748b; color: #fff; }
+.ball-tag.extra { background: #0284c7; color: #fff; }
+.ball-tag.four { background: #f59e0b; color: #fff; }
+.ball-tag.six { background: #f97316; color: #fff; }
+.ball-tag.wicket { background: #ef4444; color: #fff; }
+
+.empty-msg {
+    text-align: center;
+    color: var(--subtext);
+    font-size: 15px;
+    padding: 20px 0;
+}
+
+.info-modal {
+    text-align: center;
+    padding: 10px;
+}
+
+.info-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.info-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #f59e0b;
+    margin-bottom: 8px;
+}
+
+.info-desc {
+    font-size: 18px;
+    color: var(--subtext);
+    margin-bottom: 20px;
+}
+
+#crackerCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 3000;
+}
+
+@media (max-width: 480px) {
+    .header-title { font-size: 20px; }
+    #runs { font-size: 95px; }
+    #wickets { font-size: 45px; }
+    .overs-container { font-size: 22px; }
+    button { height: 55px; font-size: 16px; }
+    .btn-four, .btn-six { height: 75px !important; font-size: 32px !important; }
+    .btn-wicket { height: 75px !important; font-size: 18px !important; }
+}
+</style>
+</head>
+
+<body data-theme="light">
+
+<canvas id="crackerCanvas"></canvas>
+
+<div class="app-wrapper">
+
+    <!-- Header Section -->
+    <div class="header-bar">
+        <h1 class="header-title">NAC COMPUTERS RAMNAD</h1>
+        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+            ☀️
+        </button>
+    </div>
+
+    <!-- 1. Center Scoreboard Top -->
+    <div class="board-card">
+        <div class="innings-badge" id="inningsBadge">1st Innings</div>
+        <div class="score">
+            <span id="runs">0</span>
+            <span id="wickets">/0</span>
+        </div>
+        <div class="overs-container">
+            OVERS: <span id="overs">0.0</span> / <span id="maxOversDisplay">0</span>
+        </div>
+
+        <div class="target-box" id="targetBox" style="display: none;">
+            <div class="target-card">
+                <div class="lbl">Target</div>
+                <div class="val" id="dispTarget">-</div>
+            </div>
+            <div class="target-card">
+                <div class="lbl">Need</div>
+                <div class="val" id="dispNeed" style="color: #0284c7;">-</div>
+            </div>
+            <div class="target-card">
+                <div class="lbl">Balls Left</div>
+                <div class="val" id="dispBallsLeft" style="color: #f59e0b;">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Keypad Section Middle -->
+    <div class="keypad-section">
+        <div class="section-title">Match Keypad</div>
+        <div class="grid">
+            <button class="btn-dot" onclick="addDelivery('0', 0, true)">Dot</button>
+            <button class="btn-extra" onclick="addDelivery('WD', 1, false)">Wide</button>
+            <button class="btn-extra" onclick="addDelivery('NB', 1, false)">No Ball</button>
+
+            <button class="btn-one" onclick="addDelivery('1', 1, true)">1</button>
+            <button class="btn-two" onclick="addDelivery('2', 2, true)">2</button>
+            <button class="btn-three" onclick="addDelivery('3', 3, true)">3</button>
+
+            <!-- Numpad Cluster: 4 | WICKET | 6 -->
+            <button class="btn-four" onclick="addDelivery('4', 4, true)">4</button>
+            <button class="btn-wicket" onclick="wicket()">Wicket</button>
+            <button class="btn-six" onclick="addDelivery('6', 6, true)">6</button>
+
+            <button class="btn-undo" style="grid-column: span 3;" onclick="undo()">↶ Undo Last Action</button>
+        </div>
+    </div>
+
+    <!-- 3. Direct Bottom Actions -->
+    <div class="direct-actions-grid">
+        <button class="scoreBtn" onclick="openScorecard()">Scoreboard</button>
+        <button class="reset" onclick="resetMatch()">Reset Match</button>
+    </div>
+
+    <!-- Footer Credit -->
+    <div class="footer-credit">Designed by Nac Software Solution</div>
+
+</div>
+
+<!-- Initial Match Setup Modal -->
+<div class="modal-overlay active" id="matchSetupModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Start Match Setup</h2>
+        </div>
+        <div class="modal-body">
+            <div class="mode-toggle-group">
+                <button class="mode-btn active" id="btnModeStandard" onclick="selectSetupType('standard')">Standard Match</button>
+                <button class="mode-btn" id="btnModeTarget" onclick="selectSetupType('target')">Target Mode</button>
+            </div>
+
+            <div class="input-group">
+                <label for="initialOversInput">Total Overs Per Innings</label>
+                <input type="number" id="initialOversInput" placeholder="e.g. 10" min="1">
+            </div>
+
+            <div class="input-group" id="targetGroupSetup" style="display: none;">
+                <label for="initialTargetInput">Target Score to Chase</label>
+                <input type="number" id="initialTargetInput" placeholder="e.g. 120" min="1">
+            </div>
+
+            <button class="submit-btn" id="setupSubmitBtn" onclick="startMatch()">Start 1st Innings</button>
+        </div>
+    </div>
+</div>
+
+<!-- Innings Transition Modal -->
+<div class="modal-overlay" id="inningsTransitionModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>1st Innings Completed!</h2>
+        </div>
+        <div class="modal-body info-modal">
+            <div class="info-icon">🏏</div>
+            <div class="info-title" id="firstInningsScoreText">Target: 0 Runs</div>
+            <div class="info-desc" id="firstInningsDetailText">2nd Innings is ready to start.</div>
+            <button class="submit-btn" onclick="startSecondInnings()">Start Chasing (2nd Innings)</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scorecard Modal -->
+<div class="modal-overlay" id="scorecardModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Match Summary</h2>
+            <button class="close-btn" onclick="closeModal('scorecardModal')">&times;</button>
+        </div>
+        <div class="modal-body" id="modalContent"></div>
+    </div>
+</div>
+
+<!-- Winner Celebration Modal -->
+<div class="modal-overlay" id="winnerModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Match Result</h2>
+            <button class="close-btn" onclick="closeModal('winnerModal', true)">&times;</button>
+        </div>
+        <div class="modal-body info-modal">
+            <div class="info-icon">🏆 🎆</div>
+            <div class="info-title" id="winnerTitle">WINNER!</div>
+            <div class="info-desc" id="winnerDesc">Match Completed.</div>
+            <button class="submit-btn" onclick="closeModal('winnerModal', true)">Close & New Match</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let state = {
+    innings: 1,
+    runs: 0,
+    wickets: 0,
+    legalBalls: 0,
+    totalOvers: 0,
+    firstInningsRuns: 0,
+    target: null,
+    matchEnded: false,
+    oversHistory: [[]]
+};
+
+let setupType = 'standard';
+let history = [];
+
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById("themeToggleBtn");
+    if (body.getAttribute("data-theme") === "dark") {
+        body.setAttribute("data-theme", "light");
+        btn.innerText = "☀️";
+    } else {
+        body.setAttribute("data-theme", "dark");
+        btn.innerText = "🌙";
+    }
+}
+
+function saveState() {
+    history.push(JSON.parse(JSON.stringify(state)));
+}
+
+function selectSetupType(type) {
+    setupType = type;
+    const btnStd = document.getElementById("btnModeStandard");
+    const btnTgt = document.getElementById("btnModeTarget");
+    const tgtGroup = document.getElementById("targetGroupSetup");
+    const submitBtn = document.getElementById("setupSubmitBtn");
+
+    if (type === 'standard') {
+        btnStd.classList.add("active");
+        btnTgt.classList.remove("active");
+        tgtGroup.style.display = "none";
+        submitBtn.innerText = "Start 1st Innings";
+    } else {
+        btnTgt.classList.add("active");
+        btnStd.classList.remove("active");
+        tgtGroup.style.display = "block";
+        submitBtn.innerText = "Start Target Chase";
+    }
+}
+
+function startMatch() {
+    let overs = parseInt(document.getElementById("initialOversInput").value);
+    
+    if (setupType === 'standard') {
+        if (overs > 0) {
+            state.totalOvers = overs;
+            state.innings = 1;
+            closeModal("matchSetupModal");
+            updateUI();
+        } else {
+            alert("Please enter a valid number of overs.");
+        }
+    } else {
+        let targetScore = parseInt(document.getElementById("initialTargetInput").value);
+        if (overs > 0 && targetScore > 0) {
+            state.totalOvers = overs;
+            state.target = targetScore;
+            state.innings = 2;
+            closeModal("matchSetupModal");
+            updateUI();
+        } else {
+            alert("Please enter valid numbers for Overs and Target.");
+        }
+    }
+}
+
+/* Firework Cracker Animation */
+function launchCrackers() {
+    let canvas = document.getElementById("crackerCanvas");
+    let ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    let colors = ['#ff0055', '#00e5ff', '#ffbe0b', '#ff006e', '#8338ec', '#3a86ff', '#00f5d4'];
+
+    for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            let x = Math.random() * canvas.width;
+            let y = Math.random() * (canvas.height * 0.7);
+            for (let p = 0; p < 70; p++) {
+                let angle = Math.random() * Math.PI * 2;
+                let speed = Math.random() * 7 + 2;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1
+                });
+            }
+        }, i * 300);
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, index) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.05;
+            p.alpha -= 0.012;
+
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.restore();
+
+            if (p.alpha <= 0) particles.splice(index, 1);
+        });
+
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        }
+    }
+    animate();
+
+    confetti({ zIndex: 3000, particleCount: 120, spread: 80, origin: { y: 0.5 } });
+}
+
+function announceWinner(title, desc) {
+    document.getElementById("winnerTitle").innerText = title;
+    document.getElementById("winnerDesc").innerText = desc;
+    document.getElementById("winnerModal").classList.add("active");
+    launchCrackers();
+}
+
+function updateUI() {
+    document.getElementById("runs").innerText = state.runs;
+    document.getElementById("wickets").innerText = "/" + state.wickets;
+    
+    let completedOvers = Math.floor(state.legalBalls / 6);
+    let ballsInOver = state.legalBalls % 6;
+    document.getElementById("overs").innerText = completedOvers + "." + ballsInOver;
+    document.getElementById("maxOversDisplay").innerText = state.totalOvers;
+
+    let targetBox = document.getElementById("targetBox");
+
+    if (state.innings === 1) {
+        document.getElementById("inningsBadge").innerText = "1st Innings";
+        document.getElementById("inningsBadge").style.background = "#0284c7";
+        targetBox.style.display = "none";
+
+        let totalBalls = state.totalOvers * 6;
+        if (!state.matchEnded && state.totalOvers > 0) {
+            if (state.legalBalls >= totalBalls || state.wickets >= 10) {
+                state.firstInningsRuns = state.runs;
+                state.target = state.runs + 1;
+                
+                document.getElementById("firstInningsScoreText").innerText = `Target: ${state.target} Runs`;
+                document.getElementById("firstInningsDetailText").innerText = `1st Innings ended at ${state.runs}/${state.wickets} in ${completedOvers}.${ballsInOver} overs.`;
+                document.getElementById("inningsTransitionModal").classList.add("active");
+            }
+        }
+    } else {
+        document.getElementById("inningsBadge").innerText = "2nd Innings (Chasing)";
+        document.getElementById("inningsBadge").style.background = "#0d9488";
+        targetBox.style.display = "grid";
+        
+        let runsNeeded = state.target - state.runs;
+        let totalBalls = state.totalOvers * 6;
+        let ballsRemaining = totalBalls - state.legalBalls;
+
+        document.getElementById("dispTarget").innerText = state.target;
+        document.getElementById("dispNeed").innerText = runsNeeded > 0 ? runsNeeded : 0;
+        document.getElementById("dispBallsLeft").innerText = ballsRemaining > 0 ? ballsRemaining : 0;
+
+        if (!state.matchEnded) {
+            if (state.runs >= state.target) {
+                state.matchEnded = true;
+                let wksLeft = 10 - state.wickets;
+                announceWinner(
+                    "Second Batting Wins!",
+                    `Chased down target of ${state.target} with ${wksLeft} wicket${wksLeft > 1 ? 's' : ''} remaining!`
+                );
+            } else if (ballsRemaining <= 0 || state.wickets >= 10) {
+                state.matchEnded = true;
+                if (state.runs === state.target - 1) {
+                    announceWinner("Match Tied!", `Both teams scored ${state.target - 1} runs.`);
+                } else {
+                    let margin = (state.target - 1) - state.runs;
+                    announceWinner(
+                        "First Batting Wins!",
+                        `Defended total! Won by ${margin} run${margin > 1 ? 's' : ''}.`
+                    );
+                }
+            }
+        }
+    }
+}
+
+function startSecondInnings() {
+    closeModal("inningsTransitionModal");
+    saveState();
+    state.innings = 2;
+    state.runs = 0;
+    state.wickets = 0;
+    state.legalBalls = 0;
+    state.oversHistory = [[]];
+    updateUI();
+}
+
+function addDelivery(label, runsToAdd, isLegalBall) {
+    if (state.matchEnded || state.totalOvers === 0) return;
+    saveState();
+    state.runs += runsToAdd;
+
+    let currentOverIndex = state.oversHistory.length - 1;
+    state.oversHistory[currentOverIndex].push(label);
+
+    if (isLegalBall) {
+        state.legalBalls++;
+        if (state.legalBalls % 6 === 0) {
+            state.oversHistory.push([]);
+        }
+    }
+    updateUI();
+}
+
+function wicket() {
+    if (state.matchEnded || state.totalOvers === 0) return;
+    if (state.wickets < 10) {
+        saveState();
+        state.wickets++;
+        
+        let currentOverIndex = state.oversHistory.length - 1;
+        state.oversHistory[currentOverIndex].push("W");
+        
+        state.legalBalls++;
+        if (state.legalBalls % 6 === 0) {
+            state.oversHistory.push([]);
+        }
+        updateUI();
+    }
+}
+
+function undo() {
+    if (history.length > 0) {
+        state = history.pop();
+        updateUI();
+    }
+}
+
+function resetMatch() {
+    if (confirm("Reset the entire match?")) {
+        location.reload();
+    }
+}
+
+function getBallClass(tag) {
+    if (tag === '0') return 'dot';
+    if (tag === 'WD' || tag === 'NB') return 'extra';
+    if (tag === '4') return 'four';
+    if (tag === '6') return 'six';
+    if (tag === 'W') return 'wicket';
+    return '';
+}
+
+function getBallRuns(tag) {
+    if (tag === 'WD' || tag === 'NB') return 1;
+    if (tag === 'W') return 0;
+    let n = parseInt(tag, 10);
+    return isNaN(n) ? 0 : n;
+}
+
+function openScorecard() {
+    const container = document.getElementById("modalContent");
+    container.innerHTML = "";
+    let hasData = false;
+
+    state.oversHistory.forEach((over, index) => {
+        if (over.length > 0) {
+            hasData = true;
+            let overRow = document.createElement("div");
+            overRow.className = "over-row";
+
+            let overTitleWrap = document.createElement("div");
+            overTitleWrap.className = "over-title-wrap";
+
+            let overTitle = document.createElement("div");
+            overTitle.className = "over-title";
+            overTitle.innerText = "Over " + (index + 1);
+
+            let overTotalRuns = over.reduce((sum, ball) => sum + getBallRuns(ball), 0);
+            let overTotal = document.createElement("div");
+            overTotal.className = "over-total";
+            overTotal.innerText = overTotalRuns + " run" + (overTotalRuns === 1 ? "" : "s");
+
+            overTitleWrap.appendChild(overTitle);
+            overTitleWrap.appendChild(overTotal);
+
+            let ballsList = document.createElement("div");
+            ballsList.className = "balls-list";
+
+            over.forEach(ball => {
+                let ballTag = document.createElement("span");
+                ballTag.className = "ball-tag " + getBallClass(ball);
+                ballTag.innerText = ball;
+                ballsList.appendChild(ballTag);
+            });
+
+            overRow.appendChild(overTitleWrap);
+            overRow.appendChild(ballsList);
+            container.appendChild(overRow);
+        }
+    });
+
+    if (!hasData) {
+        container.innerHTML = '<div class="empty-msg">No deliveries recorded yet.</div>';
+    }
+
+    document.getElementById("scorecardModal").classList.add("active");
+}
+
+function closeModal(id, autoRefresh = false) {
+    document.getElementById(id).classList.remove("active");
+    if (autoRefresh) {
+        location.reload();
+    }
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
