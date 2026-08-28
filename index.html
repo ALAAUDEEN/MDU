@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NAC COMPUTERS RAMNAD Score Board</title>
+<title>Arul Sakthi Cricket Team  Score Board</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -41,22 +41,30 @@
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     background: var(--bg-gradient);
     color: var(--text-primary);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 12px;
 }
 
 .app-wrapper {
     width: 100%;
     max-width: 600px;
+    height: 100%;
+    min-height: calc(100vh - 24px);
+    min-height: calc(100dvh - 24px);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 /* Header Section */
@@ -64,10 +72,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .header-title {
-    font-size: 24px;
+    font-size: clamp(16px, 5vw, 24px);
     font-weight: 800;
     letter-spacing: 1px;
     background: linear-gradient(90deg, #0284c7, #6366f1);
@@ -79,6 +88,7 @@ body {
 .theme-toggle-btn {
     height: 42px;
     width: 42px;
+    min-width: 42px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
     background: var(--btn-bg);
@@ -96,10 +106,16 @@ body {
     background: var(--card-bg);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
-    padding: 25px;
+    padding: 20px 15px;
     border-radius: 24px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     text-align: center;
+    width: 100%;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
 }
 
 .innings-badge {
@@ -119,17 +135,18 @@ body {
     display: flex;
     align-items: baseline;
     justify-content: center;
+    width: 100%;
 }
 
 #runs {
-    font-size: 130px;
+    font-size: clamp(80px, 22vw, 150px);
     font-weight: 800;
     line-height: 0.9;
     color: var(--text-primary);
 }
 
 #wickets {
-    font-size: 65px;
+    font-size: clamp(40px, 11vw, 70px);
     font-weight: 700;
     color: #ef4444;
     margin-left: 8px;
@@ -137,7 +154,7 @@ body {
 
 .overs-container {
     margin-top: 10px;
-    font-size: 26px;
+    font-size: clamp(18px, 5vw, 28px);
     color: var(--subtext);
     font-weight: 600;
 }
@@ -155,6 +172,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    width: 100%;
 }
 
 .target-card {
@@ -181,9 +199,11 @@ body {
 /* Keypad Section */
 .keypad-section {
     background: var(--keypad-bg);
-    padding: 20px;
+    padding: 16px;
     border-radius: 20px;
     border: 1px solid var(--border-color);
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .section-title {
@@ -199,13 +219,13 @@ body {
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
     align-items: center;
 }
 
 button {
-    height: 60px;
-    font-size: 20px;
+    height: 56px;
+    font-size: 18px;
     font-weight: 700;
     border-radius: 14px;
     border: 1px solid var(--border-color);
@@ -214,6 +234,7 @@ button {
     cursor: pointer;
     transition: all 0.15s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 button:hover {
@@ -227,7 +248,7 @@ button:active {
 }
 
 /* Specific Run Button Colors */
-.btn-dot { font-size: 32px !important; color: var(--subtext) !important; }
+.btn-dot { font-size: 30px !important; color: var(--subtext) !important; }
 .btn-extra { background: #0284c7 !important; color: #fff !important; }
 .btn-one { background: #10b981 !important; color: #fff !important; }
 .btn-two { background: #2563eb !important; color: #fff !important; }
@@ -235,10 +256,10 @@ button:active {
 
 /* Numpad Cluster Keys: 4 | WICKET | 6 */
 .btn-four {
-    height: 85px !important;
+    height: 78px !important;
     background: linear-gradient(135deg, #0b26f5 0%, #0b26f5 100%) !important;
     color: #ffffff !important;
-    font-size: 38px !important;
+    font-size: 34px !important;
     font-weight: 900 !important;
     box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35) !important;
     border: none !important;
@@ -246,10 +267,10 @@ button:active {
 }
 
 .btn-wicket {
-    height: 85px !important;
+    height: 78px !important;
     background: linear-gradient(135deg, #f90000 0%, #ff0000 100%) !important;
     color: #ffffff !important;
-    font-size: 22px !important;
+    font-size: 20px !important;
     font-weight: 900 !important;
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35) !important;
     border: none !important;
@@ -257,23 +278,25 @@ button:active {
 }
 
 .btn-six {
-    height: 85px !important;
+    height: 78px !important;
     background: linear-gradient(135deg, #ea740c 0%, #ea740c 100%) !important;
     color: #ffffff !important;
-    font-size: 38px !important;
+    font-size: 34px !important;
     font-weight: 900 !important;
     box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35) !important;
     border: none !important;
     border-radius: 16px !important;
 }
 
-.btn-undo { background: #c4ff04 !important; color: #220909 !important; height: 55px !important; }
+.btn-undo { background: #c4ff04 !important; color: #220909 !important; height: 50px !important; }
 
 /* Always Open Direct Control Actions */
 .direct-actions-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .scoreBtn { background: #4f46e5 !important; color: white !important; }
@@ -282,10 +305,12 @@ button:active {
 /* Footer Branding */
 .footer-credit {
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--subtext);
     font-weight: 600;
     letter-spacing: 0.5px;
+    flex-shrink: 0;
+    padding-bottom: 2px;
 }
 
 /* Modal Styles */
@@ -295,6 +320,7 @@ button:active {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
     display: flex;
@@ -304,6 +330,7 @@ button:active {
     pointer-events: none;
     transition: opacity 0.2s ease;
     z-index: 1000;
+    padding: 16px;
 }
 
 .modal-overlay.active {
@@ -314,9 +341,10 @@ button:active {
 .modal {
     background: var(--modal-bg);
     border-radius: 20px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     max-height: 80vh;
+    max-height: 80dvh;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border-color);
@@ -409,6 +437,8 @@ button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .over-title-wrap {
@@ -446,6 +476,7 @@ button:active {
     border-radius: 50%;
     font-weight: 700;
     font-size: 13px;
+    flex-shrink: 0;
 }
 
 .ball-tag.dot { background: #64748b; color: #fff; }
@@ -495,13 +526,24 @@ button:active {
 }
 
 @media (max-width: 480px) {
-    .header-title { font-size: 20px; }
-    #runs { font-size: 95px; }
-    #wickets { font-size: 45px; }
-    .overs-container { font-size: 22px; }
-    button { height: 55px; font-size: 16px; }
-    .btn-four, .btn-six { height: 75px !important; font-size: 32px !important; }
-    .btn-wicket { height: 75px !important; font-size: 18px !important; }
+    body { padding: 10px; }
+    .app-wrapper { min-height: calc(100vh - 20px); min-height: calc(100dvh - 20px); gap: 10px; }
+    .board-card { padding: 16px 10px; border-radius: 20px; }
+    .keypad-section { padding: 12px; border-radius: 16px; }
+    .grid { gap: 8px; }
+    button { height: 50px; font-size: 15px; border-radius: 12px; }
+    .btn-four, .btn-six { height: 68px !important; font-size: 28px !important; }
+    .btn-wicket { height: 68px !important; font-size: 16px !important; }
+    .btn-undo { height: 46px !important; }
+}
+
+@media (max-height: 700px) {
+    #runs { font-size: clamp(60px, 18vw, 100px); }
+    #wickets { font-size: clamp(30px, 9vw, 50px); }
+    .board-card { padding: 12px 10px; }
+    .innings-badge { margin-bottom: 4px; }
+    .overs-container { margin-top: 4px; }
+    .target-box { margin-top: 10px; padding-top: 10px; }
 }
 </style>
 </head>
